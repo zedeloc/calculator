@@ -44,10 +44,16 @@ const keys = Array.from(document.querySelectorAll(".key"));
 
 keys.forEach((key) => key.addEventListener("click", () => {
     if (key.id === 'clear') {
-        updateValueField(activeValueField, key.id)
-        updateValueField(historicValueField, key.id)
+        updateValueField(activeValueField, key.id);
+        updateValueField(historicValueField, key.id);
         displayCurrentValues()
-    }else {
+    } else if (displayActive.textContent == 'FATAL ERROR: 666') {
+        updateValueField(activeValueField, 'clear');
+        updateValueField(historicValueField, 'clear');
+        updateValueField(activeValueField, key.id);
+        updateValueField(historicValueField, key.id);
+        displayCurrentValues()
+    } else {
         operatorEval(key.id)
     }
 }))
@@ -55,9 +61,14 @@ keys.forEach((key) => key.addEventListener("click", () => {
 function operatorEval(keypress) {
     if (keypress === "=" && operandA.length > 0) {
         operandB = returnActiveOperand();
-        let answer = operate(operandA, operandB, operator).toString()
-        answer = answer.split('')
-        updateValueField(activeValueField, 'clear')
+        let answer = operate(operandA, operandB, operator)
+        if (answer === "FATAL ERROR: 666") {
+            displayActive.textContent = answer;
+            return
+        }
+        answer = (Math.floor(answer * 10000) / 10000); // round to 4 decimal places
+        answer = answer.toString().split('');
+        updateValueField(activeValueField, 'clear');
         updateValueField(activeValueField, answer); 
         operandA = '';
         operandB = ''
