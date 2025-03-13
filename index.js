@@ -15,6 +15,8 @@ function divide(a, b) {
     return +a / +b;
 }
 
+const operands = ['+', '-', '*', '/']
+
 let operandA = "";
 let operandB = "";
 let operator = "";
@@ -85,8 +87,11 @@ function operatorEval(keypress) {
         || keypress === '/') {
         operator = keypress;
         updateValueField(historicValueField, keypress);
-        operandA = returnActiveOperand();
-        updateValueField(activeValueField, 'clear');
+        if (operandA.length <= 0) {
+            operandA = returnActiveOperand();
+            updateValueField(activeValueField, 'clear');
+        }
+        
     } else {
         updateValueField(activeValueField, keypress);
         updateValueField(historicValueField, keypress);
@@ -109,6 +114,21 @@ function updateValueField(valueField, valuePassed) {
         valueField.length = 0;
     } else if (valuePassed === 'delete') {
         valueField.pop();
+    } else if (valuePassed === '+' 
+        || valuePassed === '-'
+        || valuePassed === '*'
+        || valuePassed === '/') {
+            if (operands.find((op) => op === valueField[valueField.length - 1])) {
+                console.log("i popped")
+                valueField.pop()
+                valueField.push(valuePassed)
+            } else valueField.push(valuePassed)
+            // for (let op of operands) {
+            //     if (valueField[valueField.length - 1] === op) {
+            //         valueField.pop()
+            //         valueField.push(valuePassed)
+            //     }
+            // } 
     } else if (valuePassed === '.') {
         if (!valueField.find((value) => value === '.')) {
             valueField.push(valuePassed);
