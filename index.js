@@ -9,7 +9,8 @@ function multiply(a, b) {
 }
 function divide(a, b) {
     if (+a === 0 || +b === 0){
-        return "666 FATAL ERROR"
+
+        return "FATAL ERROR: 666"
     }
     return +a / +b;
 }
@@ -43,11 +44,9 @@ const keys = Array.from(document.querySelectorAll(".key"));
 
 keys.forEach((key) => key.addEventListener("click", () => {
     if (key.id === 'clear') {
-        displayActive.textContent = ''
-        displayHistoric.textContent = ''
-        operandA = ''
-        operandB = ''
-        operator = ''
+        updateValueField(activeValueField, key.id)
+        updateValueField(historicValueField, key.id)
+        displayCurrentValues()
     }else {
         operatorEval(key.id)
     }
@@ -55,26 +54,43 @@ keys.forEach((key) => key.addEventListener("click", () => {
 
 function operatorEval(keypress) {
     if (keypress === "=" && operandA.length > 0) {
-        operandB = displayActive.textContent;
-        let answer = operate(operandA, operandB, operator)
-        displayActive.textContent = answer; 
+        operandB = returnActiveOperand();
+        let answer = operate(operandA, operandB, operator).toString()
+        answer = answer.split('')
+        updateValueField(activeValueField, 'clear')
+        updateValueField(activeValueField, answer); 
+        operandA = '';
+        operandB = ''
+        updateValueField(historicValueField, 'clear')
+        updateValueField(historicValueField, answer)
+        displayCurrentValues();
+
+        return;
+    } else if (keypress === "=" && operandA.length === 0) {
+        return;
     } else if (keypress === '+' 
         || keypress === '-'
         || keypress === '*'
         || keypress === '/') {
         operator = keypress;
-        displayHistoric.textContent += keypress;
-        operandA = displayActive.textContent;
-        displayActive.textContent = "";
+        updateValueField(historicValueField, keypress);
+        operandA = returnActiveOperand();
+        updateValueField(activeValueField, 'clear');
     } else {
-        displayHistoric.textContent += keypress;
-        displayActive.textContent += keypress;
+        updateValueField(activeValueField, keypress);
+        updateValueField(historicValueField, keypress);
+        
     }
+    displayCurrentValues()
 }
 
-function updateValues(valuePassed) {
+function displayCurrentValues() {
+    displayActive.textContent = activeValueField.join('');
+    displayHistoric.textContent = historicValueField.join('');
+}
 
-
+function returnActiveOperand() {
+    return activeValueField.join('');
 }
 
 function updateValueField(valueField, valuePassed) {
@@ -83,12 +99,14 @@ function updateValueField(valueField, valuePassed) {
     } else if (valuePassed === 'delete') {
         valueField.pop();
     } else if (valuePassed === '.') {
-        for (let value of valueField ) {
-            if (value === ".") { 
-                break;
-            }
-        } 
+        if (!valueField.find((value) => value === '.')) {
+            valueField.push(valuePassed);
+        }; 
+    } else if (Array.isArray(valuePassed)) {
+        valueField.push(...valuePassed);
+      
     } else {
         valueField.push(valuePassed)
     }
+    console.log(valueField)
 }
