@@ -13,7 +13,10 @@
     <!-- Create a basic HTML calculator with buttons for each digit and operator (including =). -->
 
     <div id="calculator-body">
-        <div id="display"></div>
+        <div id="display">
+            <div id="display-historic"></div>
+            <div id="display-active"></div>
+        </div>
         <div id="keyboard">
             <div class="key-row">
                 <button id="clear" class="key">C</button>
@@ -23,25 +26,25 @@
                 <button id="7" class="key">7</button>
                 <button id="8" class="key">8</button>
                 <button id="9" class="key">9</button>
-                <button id="divide" class="key">/</button>
+                <button id="/" class="key">÷</button>
             </div>
             <div class="key-row">
                 <button id="4" class="key">4</button>
                 <button id="5" class="key">5</button>
                 <button id="6" class="key">6</button>
-                <button id="multiply" class="key">*</button>
+                <button id="*" class="key">x</button>
             </div>
             <div class="key-row">
                 <button id="1" class="key">1</button>
                 <button id="2" class="key">2</button>
                 <button id="3" class="key">3</button>
-                <button id="subtract" class="key">-</button>
+                <button id="-" class="key">-</button>
             </div>
             <div class="key-row">
                 <button id="0" class="key">0</button>
-                <button id="point" class="key">.</button>
-                <button id="equals" class="key">=</button>
-                <button id="add" class="key">+</button>
+                <button id="." class="key">.</button>
+                <button id="=" class="key">=</button>
+                <button id="+" class="key">+</button>
             </div>
         </div>
     </div>
