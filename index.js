@@ -1,3 +1,15 @@
+// MUST FIGURE OUT HOW TO HAVE NEGATIVE second OPERAND
+
+
+//global variables
+const operators = ['+', '-', '*', '/']
+let activeValueField = '';
+let returnedOperator = false
+const displayActive = document.querySelector("#display-active");
+const keys = Array.from(document.querySelectorAll(".key"));
+
+// functions start
+
 function add(a, b){
     return +a + +b;
 }
@@ -9,135 +21,165 @@ function multiply(a, b) {
 }
 function divide(a, b) {
     if (+a === 0 || +b === 0){
-
         return "FATAL ERROR: 666"
     }
     return +a / +b;
 }
 
-const operands = ['+', '-', '*', '/']
-
-let operandA = "";
-let operandB = "";
-let operator = "";
-const historicValueField = [];
-const activeValueField = []
-
-
-
-// Create a new function operate that takes an operator and two numbers and then calls one of the above functions on the numbers.
-function operate(a, b, c) {
-    if (c === "+") {
+function operate(a, b, operator) {
+    if (operator === "+") {
         return add(a, b);
-    } else if (c === "-") {
+    } else if (operator === "-") {
         return subtract(a, b);
-    } else if (c === "*") {
+    } else if (operator === "*") {
         return multiply(a, b);
-    } else if (c === "/") {
+    } else if (operator === "/") {
         return divide(a ,b);
     };
 };
 
-const displayActive = document.querySelector("#display-active");
-const displayHistoric = document.querySelector('#display-historic')
-const keys = Array.from(document.querySelectorAll(".key"));
-
-
-
 keys.forEach((key) => key.addEventListener("click", () => {
-    if (key.id === 'clear') {
-        updateValueField(activeValueField, key.id);
-        updateValueField(historicValueField, key.id);
-        displayCurrentValues()
-    } else if (displayActive.textContent == 'FATAL ERROR: 666') {
-        updateValueField(activeValueField, 'clear');
-        updateValueField(historicValueField, 'clear');
-        updateValueField(activeValueField, key.id);
-        updateValueField(historicValueField, key.id);
-        displayCurrentValues()
-    } else {
-        operatorEval(key.id)
+    if (activeValueField === "FATAL ERROR: 666") {
+        activeValueField = '';
+        returnedOperator = false;
     }
-}))
+    evaluateKeystroke(key.id);
+    }
+))
 
-function operatorEval(keypress) {
-    if (keypress === "=" && operandA.length > 0) {
-        operandB = returnActiveOperand();
-        let answer = operate(operandA, operandB, operator)
-        if (answer === "FATAL ERROR: 666") {
-            displayActive.textContent = answer;
-            return
+function detectLeadingNegativeOperand(){
+
+}
+
+function attemptOperation() {
+    if (evaluateEqualValidity()) {
+        let answer = Math.round(getAnswer() * 100000) / 100000;
+        activeValueField = "" + answer;
+        displayActive.textContent = activeValueField;
+        returnedOperator = true
+    }
+}
+
+function evaluateKeystroke(keystroke) {
+    if (keystroke === 'clear') {
+        clearAll();
+    } else if (keystroke === "delete") {
+        backspace();
+    } else if (keystroke === '=') {
+        attemptOperation();
+    } else if(operators.find((op) => keystroke === op)) {
+        evaluateOperators(keystroke);
+    } else if (keystroke === '.') {
+        evaluateDecimalValidity(keystroke)
+    } else enterKeystroke(keystroke);
+}
+
+function evaluateDecimalValidity(keystroke) {
+    if ((activeValueField.lastIndexOf(".") > -1) && findOperator(activeValueField)) {
+        let theDecimalIndex = activeValueField.lastIndexOf(".");
+        let theOperatorIndex = activeValueField.indexOf(findOperator(activeValueField));
+        if (theOperatorIndex > theDecimalIndex) {
+            enterKeystroke(keystroke);
+        } else {
+            console.log("Illegal decimal input averted, (with operator present)")
+            return false
         }
-        answer = (Math.floor(answer * 10000) / 10000); // round to 4 decimal places
-        answer = answer.toString().split('');
-        updateValueField(activeValueField, 'clear');
-        updateValueField(activeValueField, answer); 
-        operandA = '';
-        operandB = ''
-        updateValueField(historicValueField, 'clear')
-        updateValueField(historicValueField, answer)
-        displayCurrentValues();
+    } else if (activeValueField.lastIndexOf(".") > -1) {
+        console.log("Illegal decimal input averted")
+        return false
+    } else enterKeystroke(keystroke);
+}
 
-        return;
-    } else if (keypress === "=" && operandA.length === 0) {
-        return;
-    } else if (keypress === '+' 
-        || keypress === '-'
-        || keypress === '*'
-        || keypress === '/') {
-        operator = keypress;
-        updateValueField(historicValueField, keypress);
-        if (operandA.length <= 0) {
-            operandA = returnActiveOperand();
-            updateValueField(activeValueField, 'clear');
+function evaluateOperators(keystrokeOp) {
+    // fix accidental multiple operators if you choose a negative after an operator and then change it
+    if (keystrokeOp === '-') {
+        if (activeValueField.length === 0) {
+            enterKeystroke(keystrokeOp);
+        } else if (findOperator(activeValueField) === activeValueField.slice(-1)) {
+            enterKeystroke(keystrokeOp)
         }
-        
-    } else {
-        updateValueField(activeValueField, keypress);
-        updateValueField(historicValueField, keypress);
-        
     }
-    displayCurrentValues()
-}
 
-function displayCurrentValues() {
-    displayActive.textContent = activeValueField.join('');
-    displayHistoric.textContent = historicValueField.join('');
-}
-
-function returnActiveOperand() {
-    return activeValueField.join('');
-}
-
-function updateValueField(valueField, valuePassed) {
-    if (valuePassed === 'clear') {
-        valueField.length = 0;
-    } else if (valuePassed === 'delete') {
-        valueField.pop();
-    } else if (valuePassed === '+' 
-        || valuePassed === '-'
-        || valuePassed === '*'
-        || valuePassed === '/') {
-            if (operands.find((op) => op === valueField[valueField.length - 1])) {
-                console.log("i popped")
-                valueField.pop()
-                valueField.push(valuePassed)
-            } else valueField.push(valuePassed)
-            // for (let op of operands) {
-            //     if (valueField[valueField.length - 1] === op) {
-            //         valueField.pop()
-            //         valueField.push(valuePassed)
-            //     }
-            // } 
-    } else if (valuePassed === '.') {
-        if (!valueField.find((value) => value === '.')) {
-            valueField.push(valuePassed);
-        }; 
-    } else if (Array.isArray(valuePassed)) {
-        valueField.push(...valuePassed);
-      
+    if (activeValueField.length === 0) {
+        console.log("Attempt to input operator before operand averted.")
+        return;
+    } else if (operators.find((op) => op === activeValueField.slice(-1))) {
+        backspace();
+        enterKeystroke(keystrokeOp);
+        console.log("Operator replaced.");
+    } else if (findOperator(activeValueField) && (findOperator(activeValueField) !== activeValueField.slice(0, 1))) {
+        console.log("Attempt to enter second operator averted")
+        return;
     } else {
-        valueField.push(valuePassed)
+        returnedOperator = false;
+        enterKeystroke(keystrokeOp)
+    };
+}
+
+function enterKeystroke(keystroke) {
+    if (returnedOperator) {
+        console.log(`Illegal attempt to input digits averted. Returned operator : ${returnedOperator}`)
+        return;
+    } else {
+        activeValueField += keystroke;
+        displayActive.textContent = activeValueField;
+    }  
+}
+
+function clearAll() {
+    activeValueField = '';
+    displayActive.textContent = activeValueField;
+    returnedOperator = false;
+}
+
+function backspace() {
+    if (returnedOperator === true) {
+        clearAll();
+    } else {
+        activeValueField = activeValueField.slice(0, -1);
+        displayActive.textContent = activeValueField;
     }
-    console.log(valueField)
+}
+
+function splitEquationString(str) {
+    let theIndex = str.lastIndexOf(findOperator(str));
+    let ops = [str.slice(0, theIndex), 
+        str.slice(theIndex, (theIndex + 1)), 
+        str.slice(theIndex + 1)];
+    return ops
+}
+
+function evaluateEqualValidity() {
+    if (activeValueField.length === 0) {
+        return false;
+    } else if ((splitEquationString(activeValueField)[2].length > 0) && findOperator(activeValueField)) {
+        // console.log(splitEquationString(activeValueField)[2]);
+        return true
+    } else console.log("Something weird happened while evaluating equal sign validity. Neither true nor false");
+}
+
+function findOperator(str) {
+    let i = 0;
+    for (let char of str) {
+        for (let op of operators) {
+            if (op === char && i !== 0) {
+                return char;
+            }
+        }  
+        i++  
+    }
+    return null
+}
+
+function getAnswer() {
+    if (findOperator(activeValueField)) {
+        let ops = splitEquationString(activeValueField);
+        if (ops[2]) {
+            return operate(ops[0], ops[2], ops[1]);
+        }
+    } else {
+        console.log(`Incomplete Equation:"activeValueField = ${activeValueField}"`);
+        return;
+    
+    };
 }
