@@ -1,7 +1,3 @@
-// MUST FIGURE OUT HOW TO HAVE NEGATIVE second OPERAND
-
-
-//global variables
 const operators = ['+', '-', '*', '/']
 const validKeys = ['0', '1', '2', '3', '4', '5', '6', '7','8', '9','.', '/',
     '*', '-', '+', 'Delete', 'Backspace', 'Enter', '='];
@@ -50,7 +46,6 @@ document.addEventListener("keydown", event => {
     if (validKeys.find((key) => event.key === key)) {
         evaluateKeystroke(event.key);
     }
-    
 })
 
 function attemptOperation() {
@@ -67,7 +62,6 @@ function attemptOperation() {
             displayActive.textContent = activeValueField;
             returnedOperator = true
         }
-        
     }
 }
 
@@ -180,7 +174,6 @@ function evaluateEqualValidity() {
     if (activeValueField.length === 0) {
         return false;
     } else if ((splitEquationString(activeValueField)[2].length > 0) && findOperator(activeValueField)) {
-        // console.log(splitEquationString(activeValueField)[2]);
         return true
     } else console.log("Something weird happened while evaluating equal sign validity. Neither true nor false");
 }
