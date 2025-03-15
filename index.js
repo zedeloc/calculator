@@ -53,10 +53,6 @@ document.addEventListener("keydown", event => {
     
 })
 
-function detectLeadingNegativeOperand(){
-
-}
-
 function attemptOperation() {
     if (evaluateEqualValidity()) {
         let answer = getAnswer()
