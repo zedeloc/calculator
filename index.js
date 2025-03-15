@@ -3,6 +3,8 @@
 
 //global variables
 const operators = ['+', '-', '*', '/']
+const validKeys = ['0', '1', '2', '3', '4', '5', '6', '7','8', '9','.', '/',
+    '*', '-', '+', 'Delete', 'Backspace', 'Enter', '='];
 let activeValueField = '';
 let returnedOperator = false
 const displayActive = document.querySelector("#display-active");
@@ -43,6 +45,14 @@ keys.forEach((key) => key.addEventListener("click", () => {
     }
 ))
 
+document.addEventListener("keydown", event => {
+    console.log(event.key)
+    if (validKeys.find((key) => event.key === key)) {
+        evaluateKeystroke(event.key);
+    }
+    
+})
+
 function detectLeadingNegativeOperand(){
 
 }
@@ -66,11 +76,11 @@ function attemptOperation() {
 }
 
 function evaluateKeystroke(keystroke) {
-    if (keystroke === 'clear') {
+    if (keystroke === 'Delete') {
         clearAll();
-    } else if (keystroke === "delete") {
+    } else if (keystroke === "Backspace") {
         backspace();
-    } else if (keystroke === '=') {
+    } else if (keystroke === '=' || keystroke === 'Enter') {
         attemptOperation();
     } else if(operators.find((op) => keystroke === op)) {
         evaluateOperators(keystroke);
