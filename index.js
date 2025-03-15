@@ -39,10 +39,6 @@ function operate(a, b, operator) {
 };
 
 keys.forEach((key) => key.addEventListener("click", () => {
-    if (activeValueField === "FATAL ERROR: 666") {
-        activeValueField = '';
-        returnedOperator = false;
-    }
     evaluateKeystroke(key.id);
     }
 ))
@@ -53,10 +49,19 @@ function detectLeadingNegativeOperand(){
 
 function attemptOperation() {
     if (evaluateEqualValidity()) {
-        let answer = Math.round(getAnswer() * 100000) / 100000;
-        activeValueField = "" + answer;
-        displayActive.textContent = activeValueField;
-        returnedOperator = true
+        let answer = getAnswer()
+        if (answer === "FATAL ERROR: 666") {
+            activeValueField = '';
+            returnedOperator = false;
+            displayActive.textContent = answer;
+            return
+        }else { 
+            answer = Math.round(answer * 100000) / 100000;
+            activeValueField = "" + answer;
+            displayActive.textContent = activeValueField;
+            returnedOperator = true
+        }
+        
     }
 }
 
@@ -95,13 +100,24 @@ function evaluateOperators(keystrokeOp) {
     if (keystrokeOp === '-') {
         if (activeValueField.length === 0) {
             enterKeystroke(keystrokeOp);
-        } else if (findOperator(activeValueField) === activeValueField.slice(-1)) {
+        } else if (activeValueField.slice(-1) === '-' && activeValueField.slice(-2, -1) === '-') {
+            console.log("Attempt to input 3 negative symbols in a row averted");
+            return;
+        }
+        
+        else if (findOperator(activeValueField) === activeValueField.slice(-1)) {
             enterKeystroke(keystrokeOp)
         }
     }
 
     if (activeValueField.length === 0) {
-        console.log("Attempt to input operator before operand averted.")
+        console.log("Attempt to input operator before operand averted.");
+        return;
+    } else if (activeValueField.slice(-1) === '-' && (activeValueField.length === 1)) {
+        console.log("Mistaking --FIRST-- leading negative for operator averted.");
+        return;
+    } else if (activeValueField.slice(-1) === '-' && (activeValueField.slice(-2, -1) === findOperator(activeValueField))) {
+        console.log("Mistaking --SECOND-- leading negative for operator averted.");
         return;
     } else if (operators.find((op) => op === activeValueField.slice(-1))) {
         backspace();
@@ -142,7 +158,13 @@ function backspace() {
 }
 
 function splitEquationString(str) {
-    let theIndex = str.lastIndexOf(findOperator(str));
+    let theIndex;
+    if (str.slice(0, 1) === '-') {
+        let stripLeadingNegative = str.slice(1);
+        theIndex = stripLeadingNegative.indexOf(findOperator(stripLeadingNegative)) + 1;
+    } else {
+        theIndex = str.indexOf(findOperator(str));
+    }
     let ops = [str.slice(0, theIndex), 
         str.slice(theIndex, (theIndex + 1)), 
         str.slice(theIndex + 1)];
