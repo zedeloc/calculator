@@ -15,9 +15,9 @@ seemed more elegant and interesting to me.
 
 Features:
 
--Backspace \n
--Operands with decimals \n
--Negative operands \n
--Change operand in place \n
--Keyboard support \n
+-Backspace \
+-Operands with decimals \
+-Negative operands \
+-Change operand in place \
+-Keyboard support \
 -Rounds to 5 decimal places
