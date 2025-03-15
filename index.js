@@ -96,7 +96,6 @@ function evaluateDecimalValidity(keystroke) {
 }
 
 function evaluateOperators(keystrokeOp) {
-    // fix accidental multiple operators if you choose a negative after an operator and then change it
     if (keystrokeOp === '-') {
         if (activeValueField.length === 0) {
             enterKeystroke(keystrokeOp);
